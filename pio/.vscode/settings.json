@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "Dokerfile": "dockerfile",
+        "random": "cpp"
+    }
+}
