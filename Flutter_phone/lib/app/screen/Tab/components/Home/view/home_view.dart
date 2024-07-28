@@ -23,6 +23,7 @@ class HomeView extends GetView<HomeController> {
                     controller.bleSerial = BLEserial(
                         "4fafc201-1fb5-459e-8fcc-c5c9c331914b",
                         "beb5483e-36e1-4688-b7f5-ea07361b26a8",
+                        "118c877b-59b9-4610-827c-d5173aed4c27",
                         'ESP32',
                         (bool b) {},
                         (bool b) {},

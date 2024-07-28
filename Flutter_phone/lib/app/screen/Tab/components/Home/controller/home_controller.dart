@@ -7,9 +7,7 @@ import 'dart:async';
 import 'dart:developer';
 
 class HomeController extends GetxController {
-  BLEserial bleSerial = BLEserial("4fafc201-1fb5-459e-8fcc-c5c9c331914b", "beb5483e-36e1-4688-b7f5-ea07361b26a8", 'ESP32',
-      (bool b) {}, (bool b) {}, (bool b) {}, (List<dynamic> b) {});
-
+  late BLEserial bleSerial;
   List<StreamSubscription<dynamic>> subscriptionList = [];
   TextEditingController comWindow = TextEditingController();
 

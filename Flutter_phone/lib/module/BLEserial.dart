@@ -30,13 +30,15 @@ class BLEserial {
 
   // UUIDs and informations of your targeted device
   late Guid serviceUuid;
-  late Guid characteristicUuid;
+  late Guid characteristicNotifyUuid;
+  late Guid characteristicWriteUuid;
   late String targetedDeviceName;
 
-  BLEserial(String serviceUuidString, String characteristicUuidString, this.targetedDeviceName, this.deviceFounded_callback,
+  BLEserial(String serviceUuidString, String characteristicNotifyUuidString, String characteristicWriteUuidString, this.targetedDeviceName, this.deviceFounded_callback,
       this.scanStarted_callback, this.connected_callback, this.replyNotify_callback) {
     serviceUuid = Guid.fromString(serviceUuidString);
-    characteristicUuid = Guid.fromString(characteristicUuidString);
+    characteristicNotifyUuid = Guid.fromString(characteristicNotifyUuidString);
+    characteristicWriteUuid = Guid.fromString(characteristicWriteUuidString);
   }
 
   Future<void> startScan() async {
@@ -72,7 +74,7 @@ class BLEserial {
     final serviceList = await _uniqueDevice?.discoverServices();
     for (BluetoothService service in serviceList!) {
       for (BluetoothCharacteristic characteristic in service.characteristics) {
-        if (characteristic.uuid == characteristicUuid) {
+        if (characteristic.uuid == characteristicNotifyUuid) {
           await characteristic.setNotifyValue(true);
           characteristic.lastValueStream.listen((event) {
             print(event.toString());
@@ -87,13 +89,13 @@ class BLEserial {
       throw Exception(
           ["stringFormat.connectToDevice() : _connected is not true. please validate the param before call this function."]);
     }
-    String foo = '//p//';
+    String foo = 'I_am_flutter';
     List<int> bytes = ascii.encode(foo);
 
     final serviceList = await _uniqueDevice?.discoverServices();
     for (BluetoothService service in serviceList!) {
       for (BluetoothCharacteristic characteristic in service.characteristics) {
-        if (characteristic.uuid == characteristicUuid) {
+        if (characteristic.uuid == characteristicWriteUuid) {
           await characteristic.write(bytes).then((value) => call);
         }
       }

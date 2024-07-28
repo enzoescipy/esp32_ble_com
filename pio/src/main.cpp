@@ -5,7 +5,8 @@
 #include <BLE2902.h>
 
 BLEServer *pServer = NULL;
-BLECharacteristic *pCharacteristic = NULL;
+BLECharacteristic *pNotifyCharacteristic = NULL;
+BLECharacteristic *pWriteCharacteristic = NULL;
 
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
@@ -15,7 +16,8 @@ char value[] = "hello, world!";
 // https://www.uuidgenerator.net/
 
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+#define CHARACTERISTIC_NOTIFY_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+#define CHARACTERISTIC_WRITE_UUID "118c877b-59b9-4610-827c-d5173aed4c27"
 
 class MyServerCallbacks : public BLEServerCallbacks
 {
@@ -47,12 +49,19 @@ void setup()
     BLEService *pService = pServer->createService(SERVICE_UUID);
 
     // Create a BLE Characteristic
-    pCharacteristic = pService->createCharacteristic(
-        CHARACTERISTIC_UUID,
-        BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_NOTIFY | BLECharacteristic::PROPERTY_INDICATE);
+    pNotifyCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_NOTIFY_UUID,
+        BLECharacteristic::PROPERTY_NOTIFY);
+    // Creates BLE Descriptor 0x2902: Client Characteristic Configuration Descriptor (CCCD)
+    pNotifyCharacteristic->addDescriptor(new BLE2902());
+
+    // Create a BLE Characteristic
+    pWriteCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_WRITE_UUID,
+        BLECharacteristic::PROPERTY_WRITE);
 
     // Creates BLE Descriptor 0x2902: Client Characteristic Configuration Descriptor (CCCD)
-    pCharacteristic->addDescriptor(new BLE2902());
+    pWriteCharacteristic->addDescriptor(new BLE2902());
 
     // Start the service
     pService->start();
@@ -68,20 +77,19 @@ void setup()
 
 void loop()
 {
-    if (deviceConnected) {
-        pCharacteristic->setValue((uint8_t *)&value, 11);
-        pCharacteristic->notify();
-        Serial.print("-");
-        delay(1500);
-    }
     // notify changed value
-    if (deviceConnected)
-    {
-        pCharacteristic->setValue((uint8_t *)&value, 11);
-        pCharacteristic->notify();
-        Serial.print("-");
+    if (deviceConnected) {
+        pNotifyCharacteristic->setValue((uint8_t *)&value, 11);
+        pNotifyCharacteristic->notify();
+
+        std::string value = pWriteCharacteristic->getValue();
+        if (value.length() > 0) {
+            pWriteCharacteristic->setValue((uint8_t *) "",0);
+            Serial.println(value.c_str());
+        }
         delay(1500);
     }
+
     // disconnecting
     if (!deviceConnected && oldDeviceConnected)
     {

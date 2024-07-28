@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "Dokerfile": "dockerfile",
-        "random": "cpp"
+        "random": "cpp",
+        "optional": "cpp",
+        "system_error": "cpp"
     }
 }
