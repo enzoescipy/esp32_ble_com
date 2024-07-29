@@ -19,20 +19,20 @@ char value[] = "hello, world!";
 #define CHARACTERISTIC_NOTIFY_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define CHARACTERISTIC_WRITE_UUID "118c877b-59b9-4610-827c-d5173aed4c27"
 
-class MyServerCallbacks : public BLEServerCallbacks
-{
-    void onConnect(BLEServer *pServer)
-    {
-        delay(1000);
-        deviceConnected = true;
-    };
+// class MyServerCallbacks : public BLEServerCallbacks
+// {
+//     void onConnect(BLEServer *pServer)
+//     {
+//         delay(1000);
+//         deviceConnected = true;
+//     };
 
-    void onDisconnect(BLEServer *pServer)
-    {
-        delay(1000);
-        deviceConnected = false;
-    }
-};
+//     void onDisconnect(BLEServer *pServer)
+//     {
+//         delay(1000);
+//         deviceConnected = false;
+//     }
+// };
 
 void setup()
 {
@@ -43,7 +43,7 @@ void setup()
 
     // Create the BLE Server
     pServer = BLEDevice::createServer();
-    pServer->setCallbacks(new MyServerCallbacks());
+    // pServer->setCallbacks(new MyServerCallbacks());
 
     // Create the BLE Service
     BLEService *pService = pServer->createService(SERVICE_UUID);
@@ -77,6 +77,8 @@ void setup()
 
 void loop()
 {
+    deviceConnected = pServer->getConnectedCount() > 0;
+    Serial.println(deviceConnected);
     // notify changed value
     if (deviceConnected) {
         pNotifyCharacteristic->setValue((uint8_t *)&value, 11);
